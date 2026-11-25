@@ -18,25 +18,112 @@ function App() {
             fullName: 'Andrew Jones',
             email: 'andrew@gmail.com',
             phone: '0712345673'
+        },
+        {
+            id: 'PAT-002',
+            fullName: 'Mary Wanjiku',
+            email: 'mary@gmail.com',
+            phone: '0711223344'
+        },
+        {
+            id: 'PAT-003',
+            fullName: 'Peter Kamau',
+            email: 'peter@gmail.com',
+            phone: '0722334455'
         }
     ]);
 
-    // Controls whether the form is displayed
+    // Form visibility
     const [showForm, setShowForm] = useState(false);
 
-    // Add a new patient
-    const handleAddPatient = (patientData) => {
+    // Patient currently being edited
+    const [editingPatient, setEditingPatient] = useState(null);
 
-        const newPatient = {
-            id: `PAT-${String(patients.length + 1).padStart(3, '0')}`,
-            ...patientData
-        };
+    // Search text
+    const [searchTerm, setSearchTerm] = useState('');
 
-        setPatients([...patients, newPatient]);
+    // Open form for adding a new patient
+    const handleShowForm = () => {
+        setEditingPatient(null);
+        setShowForm(true);
+    };
+
+    // Close form
+    const handleCloseForm = () => {
+        setShowForm(false);
+        setEditingPatient(null);
+    };
+
+    // Open form for editing
+    const handleEditPatient = (patient) => {
+        setEditingPatient(patient);
+        setShowForm(true);
+    };
+
+    // Save a new patient or update an existing patient
+    const handleSavePatient = (patientData) => {
+
+        if (editingPatient) {
+
+            setPatients((previousPatients) =>
+                previousPatients.map((patient) =>
+                    patient.id === editingPatient.id
+                        ? { ...patient, ...patientData }
+                        : patient
+                )
+            );
+
+        } else {
+
+            const newPatient = {
+                id: `PAT-${Date.now()}`,
+                ...patientData
+            };
+
+            setPatients((previousPatients) => [
+                ...previousPatients,
+                newPatient
+            ]);
+
+        }
 
         setShowForm(false);
+        setEditingPatient(null);
 
     };
+
+    // Delete a patient
+    const handleDeletePatient = (patientId) => {
+
+        const confirmDelete = window.confirm(
+            'Are you sure you want to delete this patient?'
+        );
+
+        if (confirmDelete) {
+
+            setPatients((previousPatients) =>
+                previousPatients.filter(
+                    (patient) => patient.id !== patientId
+                )
+            );
+
+        }
+
+    };
+
+    // Search and filter patients
+    const filteredPatients = patients.filter((patient) => {
+
+        const search = searchTerm.toLowerCase();
+
+        return (
+            patient.fullName.toLowerCase().includes(search) ||
+            patient.email.toLowerCase().includes(search) ||
+            patient.phone.toLowerCase().includes(search) ||
+            patient.id.toLowerCase().includes(search)
+        );
+
+    });
 
     return (
 
@@ -90,18 +177,24 @@ function App() {
                     {/* PATIENT PROFILE */}
                     <PatientProfile />
 
-                    {/* SHOW FORM WHEN REQUESTED */}
+                    {/* PATIENT FORM */}
                     {showForm && (
                         <PatientForm
-                            onAddPatient={handleAddPatient}
-                            onCancel={() => setShowForm(false)}
+                            key={editingPatient?.id || 'new-patient'}
+                            initialData={editingPatient}
+                            onSavePatient={handleSavePatient}
+                            onCancel={handleCloseForm}
                         />
                     )}
 
                     {/* PATIENT TABLE */}
                     <PatientTable
-                        patients={patients}
-                        onAddClick={() => setShowForm(true)}
+                        patients={filteredPatients}
+                        onAddClick={handleShowForm}
+                        onEdit={handleEditPatient}
+                        onDelete={handleDeletePatient}
+                        searchTerm={searchTerm}
+                        onSearchChange={setSearchTerm}
                     />
 
                     <Footer />

@@ -1,7 +1,15 @@
 
-function PatientTable({ patients, onAddClick }) {
+function PatientTable({
+    patients,
+    onAddClick,
+    onEdit,
+    onDelete,
+    searchTerm,
+    onSearchChange
+}) {
 
     return (
+
         <div className="card table-card">
 
             <div className="card-body">
@@ -28,6 +36,26 @@ function PatientTable({ patients, onAddClick }) {
 
                 </div>
 
+                {/* SEARCH INPUT */}
+                <div className="row mb-3">
+
+                    <div className="col-md-4">
+
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search patient..."
+                            value={searchTerm}
+                            onChange={(e) =>
+                                onSearchChange(e.target.value)
+                            }
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* PATIENT TABLE */}
                 <div className="table-responsive">
 
                     <table className="table table-hover">
@@ -45,41 +73,57 @@ function PatientTable({ patients, onAddClick }) {
 
                         <tbody>
 
-                            {patients.map((patient) => (
+                            {patients.length > 0 ? (
 
-                                <tr key={patient.id}>
+                                patients.map((patient) => (
 
-                                    <td>{patient.id}</td>
+                                    <tr key={patient.id}>
 
-                                    <td>{patient.fullName}</td>
+                                        <td>{patient.id}</td>
 
-                                    <td>{patient.email}</td>
+                                        <td>{patient.fullName}</td>
 
-                                    <td>{patient.phone}</td>
+                                        <td>{patient.email}</td>
 
-                                    <td>
-                                        <span className="badge bg-success">
-                                            Active
-                                        </span>
+                                        <td>{patient.phone}</td>
+
+                                        <td>
+                                            <span className="badge bg-success">
+                                                Active
+                                            </span>
+                                        </td>
+
+                                        <td>
+
+                                            <button
+                                                className="btn btn-sm btn-outline-primary me-1"
+                                                onClick={() => onEdit(patient)}
+                                            >
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+
+                                            <button
+                                                className="btn btn-sm btn-outline-danger"
+                                                onClick={() => onDelete(patient.id)}
+                                            >
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                ))
+
+                            ) : (
+
+                                <tr>
+                                    <td colSpan="6" className="text-center">
+                                        No patients found.
                                     </td>
-
-                                    <td>
-                                        <button className="btn btn-sm btn-outline-info">
-                                            <i className="bi bi-eye"></i>
-                                        </button>
-
-                                        <button className="btn btn-sm btn-outline-primary ms-1">
-                                            <i className="bi bi-pencil"></i>
-                                        </button>
-
-                                        <button className="btn btn-sm btn-outline-danger ms-1">
-                                            <i className="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-
                                 </tr>
 
-                            ))}
+                            )}
 
                         </tbody>
 

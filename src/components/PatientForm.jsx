@@ -1,48 +1,47 @@
 
 import { useState } from 'react';
 
-function PatientForm({ onAddPatient, onCancel }) {
+function PatientForm({
+    onSavePatient,
+    onCancel,
+    initialData
+}) {
 
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        phone: ''
-    });
+    const [formData, setFormData] = useState(() => ({
+        fullName: initialData?.fullName || '',
+        email: initialData?.email || '',
+        phone: initialData?.phone || ''
+    }));
 
     // Capture input changes
     const handleChange = (e) => {
 
         const { name, value } = e.target;
 
-        setFormData({
-            ...formData,
+        setFormData((previousData) => ({
+            ...previousData,
             [name]: value
-        });
+        }));
 
     };
 
-    // Handle form submission
+    // Submit the form
     const handleSubmit = (e) => {
 
         e.preventDefault();
 
-        onAddPatient(formData);
-
-        setFormData({
-            fullName: '',
-            email: '',
-            phone: ''
-        });
+        onSavePatient(formData);
 
     };
 
     return (
+
         <div className="card shadow-sm mb-4">
 
             <div className="card-body">
 
                 <h5 className="fw-bold mb-4">
-                    Register New Patient
+                    {initialData ? 'Edit Patient' : 'Register New Patient'}
                 </h5>
 
                 <form onSubmit={handleSubmit}>
@@ -57,7 +56,6 @@ function PatientForm({ onAddPatient, onCancel }) {
                             type="text"
                             name="fullName"
                             className="form-control"
-                            placeholder="Enter full name"
                             value={formData.fullName}
                             onChange={handleChange}
                             required
@@ -75,7 +73,6 @@ function PatientForm({ onAddPatient, onCancel }) {
                             type="email"
                             name="email"
                             className="form-control"
-                            placeholder="Enter email"
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -93,7 +90,6 @@ function PatientForm({ onAddPatient, onCancel }) {
                             type="tel"
                             name="phone"
                             className="form-control"
-                            placeholder="Enter phone number"
                             value={formData.phone}
                             onChange={handleChange}
                             required
@@ -105,7 +101,7 @@ function PatientForm({ onAddPatient, onCancel }) {
                         type="submit"
                         className="btn btn-primary"
                     >
-                        Save Patient
+                        {initialData ? 'Update Patient' : 'Save Patient'}
                     </button>
 
                     <button
